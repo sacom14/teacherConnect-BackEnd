@@ -1,4 +1,4 @@
-require ('dotenv').config(); //para cargar las variables de entorno del archivo .env
+require('dotenv').config(); //para cargar las variables de entorno del archivo .env
 const db = require('../config/dbConfig'); //conectar con bd
 const bcrypt = require('bcrypt'); //para hasehar el pass
 const jwt = require('jsonwebtoken');
@@ -67,14 +67,14 @@ const updateTeacher = async (req, res, next) => {
 const addNewTeacher = async (req, res, next) => {
     try {
         // Recuperar los datos del cuerpo de la solicitud
-        const { teacher_name, teacher_surname, teacher_email, teacher_password, teacher_phone, teacher_birthdate, teacher_photo } = req.body;
-        const hashedPassword = await bcrypt.hash(teacher_password, 10);
+        const { teacherName, teacherSurname, teacherEmail, teacherPassword, teacherPhone, teacherBirthdate, teacherPhoto } = req.body;
+        const hashedPassword = await bcrypt.hash(teacherPassword, 10);
 
         const query = `
         INSERT INTO teacher (teacher_name, teacher_surname, teacher_email, teacher_password, teacher_phone, teacher_birthdate, teacher_photo)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        const result = await db.execute(query, [teacher_name, teacher_surname, teacher_email, hashedPassword, teacher_phone, teacher_birthdate, teacher_photo]);
+        const result = await db.execute(query, [teacherName, teacherSurname, teacherEmail, hashedPassword, teacherPhone, teacherBirthdate, teacherPhoto]);
 
         res.status(201).json({ message: "Teacher successfully added", teacherId: result[0].insertId });
     }
@@ -85,28 +85,49 @@ const addNewTeacher = async (req, res, next) => {
 
 const teacherLogin = async (req, res, next) => {
     try {
-        const {teacher_email, teacher_password} = req.body;
+        const { teacher_email, teacher_password } = req.body;
 
         //revisar el email existente en la BD
         const query = 'SELECT * FROM teacher WHERE teacher_email = ?';
         const [teacher, _] = await db.execute(query, [teacher_email]);
 
-        if (teacher.length>0){
+        if (teacher.length > 0) {
             const comparePassword = await bcrypt.compare(teacher_password, teacher[0].teacher_password);
-            if (comparePassword){
+            if (comparePassword) {
                 const secretKey = process.env.JWT_SECRET_KEY;
                 //emitir el TOKEN
-                const token = jwt.sign({ id:teacher[0].id_teacher}, secretKey, {expiresIn: '1h'});
-                res.status(200).json({token});
+                const token = jwt.sign({ id: teacher[0].id_teacher }, secretKey, { expiresIn: '1h' });
+                res.status(200).json({ token });
             } else {
-                res.status(401).json({message:"password authentication failed"});
+                res.status(401).json({ message: "password authentication failed" });
             }
         } else {
-            res.status(404).json({message: "Teacher not found on BD"});
+            res.status(404).json({ message: "Teacher not found on BD" });
         }
     } catch (error) {
-        res.status(500).json({error: error.message});
+        res.status(500).json({ error: error.message });
     }
 }
 
-module.exports = { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin };
+const checkRepeatEmail = async (req, res, next) => {
+    try {
+        const { teacherEmail } = req.body;
+        console.log(teacherEmail);
+        // Consulta para verificar si existe un email en la tabla 'teacher'
+        const query = 'SELECT * FROM teacher WHERE teacher_email = ?';
+        const [rows] = await db.query(query, [teacherEmail]);
+        console.log(rows)
+
+        if (rows.length > 0) {
+            // Si hay resultados, significa que el email ya existe
+            res.status(409).json({ message: "Email already exists" });
+        } else {
+            res.status(200).json({ message: "This Email doesn't exist on BD" });
+        }
+    } catch (error) {
+        // Manejo de errores generales
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin, checkRepeatEmail };

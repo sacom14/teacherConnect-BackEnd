@@ -3,7 +3,7 @@ const router = express.Router();
 const authenticateToken = require('../middlewares/authenticateToken');
 
 //importando controladores
-const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin } = require('../controllers/teacher-controllers');
+const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin, checkRepeatEmail } = require('../controllers/teacher-controllers');
 //get
 router.get('/', getAllTeachers);
 
@@ -18,5 +18,8 @@ router.post('/', addNewTeacher);
 
 //login
 router.post('/login', teacherLogin);
+
+//chek repeat email
+router.post('/check-email', checkRepeatEmail)
 
 module.exports = router;
