@@ -1,18 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const authenticateToken = require('../middlewares/authenticateToken');
 
 //importando controladores
-const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher } = require('../controllers/teacher-controllers');
+const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin } = require('../controllers/teacher-controllers');
 //get
 router.get('/', getAllTeachers);
 
 //get by ID
 router.get('/:id', getTeacherById);
 
-//create new
+//update
+router.put('/:id',authenticateToken, updateTeacher);
+
+//create new -- Register
 router.post('/', addNewTeacher);
 
-//update
-router.put('/:id', updateTeacher);
+//login
+router.post('/login', teacherLogin);
 
 module.exports = router;
