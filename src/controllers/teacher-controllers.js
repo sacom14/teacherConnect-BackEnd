@@ -122,7 +122,7 @@ const checkRepeatEmail = async (req, res, next) => {
             // Si hay resultados, significa que el email ya existe
             res.status(409).json({ message: "Email already exists" });
         } else {
-            res.status(200).json({ message: "This Email doesn't exist on BD" });
+            res.status(200).json({ message: "Email unique" });
         }
     } catch (error) {
         // Manejo de errores generales
