@@ -10,6 +10,31 @@ const getAllStudents = async (req, res, next) => {
     }
 };
 
+const getStudentsByTeacher = async (req, res, next) => {
+    try {
+        // teacherID
+        const teacherId = req.params.teacherId;
+        console.log(teacherId);
+
+        const query = `
+            SELECT * FROM student
+            WHERE fk_id_teacher = ?
+        `;
+
+        const [students, _] = await db.execute(query, [teacherId]);
+
+        if(students.length > 0){
+            res.status(200).json({ students });
+        } else {
+            res.status(200).json({ message: 'Any students for this teacher' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 const getStudentById = async (req, res, next) => {
     try {
         //cogemos el parametro de ID
@@ -33,12 +58,12 @@ const addNewStudent = async (req, res, next) => {
     try {
         //Datos del body de la solicitud
         const {
-            student_name,
-            student_surname,
-            student_email,
-            student_birthdate,
-            student_phone,
-            student_photo,
+            studentName,
+            studentSurname,
+            studentEmail,
+            studentBirthdate,
+            studentPhone,
+            studentPhoto,
             fk_id_teacher,
             fk_id_academic_year,
             fk_id_payment_method
@@ -59,12 +84,12 @@ const addNewStudent = async (req, res, next) => {
         `;
 
         const result = await db.execute(query, [
-            student_name,
-            student_surname,
-            student_email,
-            student_birthdate,
-            student_phone,
-            student_photo,
+            studentName,
+            studentSurname,
+            studentEmail,
+            studentBirthdate,
+            studentPhone,
+            studentPhoto,
             fk_id_teacher,
             fk_id_academic_year,
             fk_id_payment_method
@@ -113,4 +138,4 @@ const updateStudent = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent };
+module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent, getStudentsByTeacher };
