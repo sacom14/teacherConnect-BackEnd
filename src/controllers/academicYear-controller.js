@@ -2,7 +2,7 @@ const db = require('../config/dbConfig');
 
 const getAllAcademicYears = async (req, res, next) => {
     try {
-        const [academicYears, _] = await db.execute('SELECT * FROM academic_year');
+        const [academicYears, _] = await db.execute('SELECT * FROM academic_year ORDER BY id_academic_year ASC');
         res.status(200).json({ academicYears });
     }
     catch (error) {

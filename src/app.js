@@ -29,7 +29,7 @@ app.use('/api/session', session);
 app.use('/api/session-valoration', sessionValoration);
 app.use('/api/student', student);
 // app.use('/api/studentObservation', studentObservation);
-// app.use('/api/studentSubject', studentSubject);
+app.use('/api/studentSubject', studentSubject);
 app.use('/api/subject', subject);
 
 

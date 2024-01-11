@@ -35,7 +35,7 @@ const getTeacherById = async (req, res, next) => {
 const updateTeacher = async (req, res, next) => {
     try {
         const id = req.params.id; //cogemos el parametro de ID
-        const { teacher_name, teacher_surname, teacher_email, teacher_password, teacher_phone, teacher_birthdate, teacher_photo } = req.body;
+        const { teacherName, teacherSurname, teacherEmail, teacherPassword, teacherPhone, teacherBirthdate, teacherPhoto } = req.body;
         const hashedPassword = await bcrypt.hash(teacher_password, 10);
 
         const query = `
@@ -51,7 +51,7 @@ const updateTeacher = async (req, res, next) => {
         `;
 
         //[result] para ver resultado de consulta de affectdRows
-        const [result] = await db.execute(query, [teacher_name, teacher_surname, teacher_email, hashedPassword, teacher_phone, teacher_birthdate, teacher_photo, id]);
+        const [result] = await db.execute(query, [teacherName, teacherSurname, teacherEmail, teacherPassword, teacherPhone, teacherBirthdate, teacherPhoto, id]);
 
         if (result.affectedRows > 0) {
             res.status(200).json({ message: "Teacher successfully updated" });
@@ -97,7 +97,7 @@ const teacherLogin = async (req, res, next) => {
                 const secretKey = process.env.JWT_SECRET_KEY;
                 //emitir el TOKEN
                 const token = jwt.sign({ id: teacher[0].id_teacher }, secretKey, { expiresIn: '1h' });
-                res.status(200).json({ token });
+                res.status(200).json({ token, teacherId: teacher[0].id_teacher });
             } else {
                 res.status(401).json({ message: "password authentication failed" });
             }
