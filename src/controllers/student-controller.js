@@ -61,6 +61,8 @@ const getStudentById = async (req, res, next) => {
 
 const addNewStudent = async (req, res, next) => {
     try {
+        // teacherID
+        const teacherId = req.params.teacherId;
         //Datos del body de la solicitud
         const {
             studentName,
@@ -69,7 +71,6 @@ const addNewStudent = async (req, res, next) => {
             studentBirthdate,
             studentPhone,
             studentPhoto,
-            fkIdTeacher,
             fkIdAcademicYear,
             fkIdPaymentMethod
         } = req.body;
@@ -95,13 +96,13 @@ const addNewStudent = async (req, res, next) => {
             studentBirthdate,
             studentPhone,
             studentPhoto,
-            fkIdTeacher,
+            teacherId,
             fkIdAcademicYear,
             fkIdPaymentMethod
         ]);
 
         // Enviar respuesta
-        res.status(201).json({ message: "Student successfully added", studentId: result[0].insertId });
+        res.status(201).json({ message: "Student successfully added", studentId: result.insertId });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
@@ -143,4 +144,28 @@ const updateStudent = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent, getStudentsByTeacher };
+const checkRepeatEmail = async (req, res, next) => {
+    try {
+        const teacherId = req.params.teacherId;
+        const { studentEmail } = req.body;
+
+        const studentQuery = 'SELECT * FROM student WHERE fk_id_teacher = ?';
+        const [students] = await db.query(studentQuery, [teacherId]);
+
+        // Comprobar si alguno de los estudiantes tiene el email proporcionado
+        const emailExists = students.some(student => student.student_email === studentEmail);
+
+        if (emailExists) {
+            // Si se encuentra el email, enviar respuesta de conflicto
+            res.status(409).json({ message: "Email already exists" });
+        } else {
+            // Si no se encuentra el email, enviar respuesta de éxito
+            res.status(200).json({ message: "Email unique" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent, getStudentsByTeacher, checkRepeatEmail };
