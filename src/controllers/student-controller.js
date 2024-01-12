@@ -102,7 +102,7 @@ const addNewStudent = async (req, res, next) => {
         ]);
 
         // Enviar respuesta
-        res.status(201).json({ message: "Student successfully added", studentId: result.insertId });
+        res.status(201).json({ message: "Student successfully added", id_student: result[0].insertId });
     }
     catch (error) {
         res.status(500).json({ error: error.message });

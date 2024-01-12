@@ -64,8 +64,8 @@ const addNewStudentSubject = async (req, res, next) => {
     try {
         //Datos del body de la solicitud
         const {
-            fkIdStudent,
-            fkIdSubject
+            studentId,
+            subjectId
         } = req.body;
 
         const query = `
@@ -76,8 +76,8 @@ const addNewStudentSubject = async (req, res, next) => {
         `;
 
         const result = await db.execute(query, [
-            fkIdStudent,
-            fkIdSubject
+            studentId,
+            subjectId
         ]);
 
         // Enviar respuesta
