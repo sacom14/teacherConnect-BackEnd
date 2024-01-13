@@ -88,4 +88,21 @@ const addNewStudentSubject = async (req, res, next) => {
     }
 }
 
-module.exports = { getAllStudentSubjects, getSubjectsByStudent, getStudentsBySubject, addNewStudentSubject };
+const deleteStudentSubject = async (req, res, next) => {
+    try {
+        const studentId = req.params.studentId;
+
+        const query = 'DELETE FROM student_subject WHERE fk_id_student = ?';
+        const values = [studentId];
+
+        const result = await db.query(query, values);
+
+        res.status(200).json({ message: 'Student_subject deleted successfully' });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+module.exports = { getAllStudentSubjects, getSubjectsByStudent, getStudentsBySubject, addNewStudentSubject, deleteStudentSubject };

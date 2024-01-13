@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 //importando controladores
-const { getAllStudentSubjects, getSubjectsByStudent, getStudentsBySubject, addNewStudentSubject } = require('../controllers/studentSubject-controller');
+const { getAllStudentSubjects, getSubjectsByStudent, getStudentsBySubject, addNewStudentSubject, deleteStudentSubject } = require('../controllers/studentSubject-controller');
 //get
 router.get('/', getAllStudentSubjects);
 
@@ -15,4 +15,6 @@ router.get('/subject/:subjectId', getStudentsBySubject);
 //add new student_subject
 router.post('/', addNewStudentSubject)
 
+//delete student_subject
+router.delete('/:studentId', deleteStudentSubject )
 module.exports = router;

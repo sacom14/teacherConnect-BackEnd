@@ -40,17 +40,17 @@ const getStudentById = async (req, res, next) => {
         //cogemos el parametro de ID
         const id = req.params.id;
 
-        const [students, _] = await db.execute(`
+        const [studentById, _] = await db.execute(`
             SELECT *, academic_year_name, payment_method_name FROM student
             INNER JOIN academic_year ON fk_id_academic_year = id_academic_year
             INNER JOIN payment_method ON fk_id_payment_method = id_payment_method
             WHERE id_student = ?
         `, [id]);
 
-        if (students.length > 0) {
-            res.status(200).json({ students });
+        if (studentById.length > 0) {
+            res.status(200).json({ studentById });
         } else {
-            res.status(200).json({ message: 'Any student with this ID' });
+            res.status(200).json({ message: 'Any student with this Id' });
 
         }
     }
@@ -134,7 +134,7 @@ const updateStudent = async (req, res, next) => {
         const [result] = await db.execute(query, [studentName, studentSurname, studentEmail, studentBirthdate, studentPhone, studentPhoto, fkIdTeacher, fkIdAcademicYear, fkIdPaymentMethod, id]);
 
         if (result.affectedRows > 0) {
-            res.status(200).json({ message: "Student successfully updated" });
+            res.status(200).json({ message: "Student successfully updated"});
         } else {
             res.status(404).json({ message: "Any student with this ID" });
         }
