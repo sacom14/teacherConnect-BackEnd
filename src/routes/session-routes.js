@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 //importando controladores
-const { getSessionsByStudent, getSessionById, addNewSession, updateSession } = require('../controllers/session-controller');
+const { getAllSessionsByTeacher, getSessionsByStudent, getSessionById, addNewSession, updateSession } = require('../controllers/session-controller');
+
+//get all sessions from techerId
+router.get('/teacher/:teacherId', getAllSessionsByTeacher);
 
 //get todas las sessiones de un mismo estudiante
 router.get('/student/:studentId', getSessionsByStudent);
@@ -11,7 +14,7 @@ router.get('/student/:studentId', getSessionsByStudent);
 router.get('/:id', getSessionById);
 
 //create new
-router.post('/student-subject/:id_student_subject', addNewSession);
+router.post('/student-subject/:fkIdStudentSubject', addNewSession);
 
 //update
 router.put('/:id', updateSession);

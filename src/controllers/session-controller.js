@@ -1,5 +1,32 @@
 const db = require('../config/dbConfig');
 
+const getAllSessionsByTeacher = async(req, res, next) => {
+    try {
+        // Obtener el ID del estudiante
+        const teacherId = req.params.teacherId;
+
+        const query = `
+            SELECT id_session, session_name, session_objective, session_start, session_end, session_tasks, session_payed, fk_id_student_subject, create_at_session, update_at_session, student_name, id_student, subject_name, id_subject FROM session
+            INNER JOIN student_subject ON fk_id_student_subject = id_student_subject
+            INNER JOIN subject ON fk_id_subject = id_subject
+            INNER JOIN student ON fk_id_student = id_student
+            INNER JOIN teacher ON fk_id_teacher = id_teacher
+            WHERE id_teacher = ?;
+        `;
+
+        const [sessions, _] = await db.execute(query, [teacherId]);
+
+        if(sessions.length > 0){
+            res.status(200).json({ sessions });
+        } else {
+            res.status(200).json({ message: 'Any sessions for this teacher' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 const getSessionsByStudent = async (req, res, next) => {
     try {
         // Obtener el ID del estudiante
@@ -46,8 +73,16 @@ const getSessionById = async (req, res, next) => {
 const addNewSession = async (req, res, next) => {
     try {
         // datos del body
-        const { session_name, session_objective, session_start, session_end, session_tasks, session_payed } = req.body;
-        const fk_id_student_subject = req.params.id_student_subject;
+        const { sessionName, 
+            sessionObjective, 
+            sessionStart, 
+            sessionEnd, 
+            sessionTasks} = req.body;
+        console.log('body', req.body);
+
+        const fkIdStudentSubject = req.params.fkIdStudentSubject;
+        console.log('params', req.params.fkIdStudentSubject);
+        const sessionPayed = false;
 
         const query = `
             INSERT INTO session (
@@ -61,13 +96,13 @@ const addNewSession = async (req, res, next) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         const result = await db.execute(query, [
-            session_name, 
-            session_objective, 
-            session_start, 
-            session_end, 
-            session_tasks, 
-            session_payed, 
-            fk_id_student_subject
+            sessionName, 
+            sessionObjective, 
+            sessionStart, 
+            sessionEnd, 
+            sessionTasks, 
+            sessionPayed, 
+            fkIdStudentSubject
         ]);
 
         res.status(201).json({ message: "Session successfully added", sessionId: result[0].insertId });
@@ -115,4 +150,4 @@ const updateSession = async (req, res, next) => {
     }
 };
 
-module.exports = { getSessionsByStudent, getSessionById, addNewSession, updateSession };
+module.exports = { getAllSessionsByTeacher, getSessionsByStudent, getSessionById, addNewSession, updateSession };
