@@ -33,11 +33,14 @@ const getSessionsByStudent = async (req, res, next) => {
         const studentId = req.params.studentId;
 
         const query = `
-            SELECT * FROM session
-            JOIN student_subject ON fk_id_student_subject = id_student_subject
-            WHERE fk_id_student = ?
+            SELECT id_session, session_name, session_objective, session_start, session_end, session_tasks, session_payed, fk_id_student_subject, create_at_session, update_at_session, student_name, id_student, subject_name, id_subject FROM session
+            INNER JOIN student_subject ON fk_id_student_subject = id_student_subject
+            INNER JOIN subject ON fk_id_subject = id_subject
+            INNER JOIN student ON fk_id_student = id_student
+            INNER JOIN teacher ON fk_id_teacher = id_teacher
+            WHERE fk_id_student = ?;
         `;
-
+        
         const [sessions, _] = await db.execute(query, [studentId]);
 
         if(sessions.length > 0){
@@ -56,7 +59,12 @@ const getSessionById = async (req, res, next) => {
         //cogemos el parametro de ID
         const id = req.params.id;
 
-        const [sessions, _] = await db.execute('SELECT * FROM session WHERE id_session = ?', [id]);
+        const [sessions, _] = await db.execute(`SELECT id_session, session_name, session_objective, session_start, session_end, session_tasks, session_payed, fk_id_student_subject, create_at_session, update_at_session, student_name, id_student, subject_name, id_subject FROM session
+        INNER JOIN student_subject ON fk_id_student_subject = id_student_subject
+        INNER JOIN subject ON fk_id_subject = id_subject
+        INNER JOIN student ON fk_id_student = id_student
+        INNER JOIN teacher ON fk_id_teacher = id_teacher
+        WHERE id_session = ?`, [id]);
         
         if(sessions.length > 0){
             res.status(200).json({ sessions });
@@ -116,7 +124,7 @@ const updateSession = async (req, res, next) => {
     try {
         //id de session
         const id = req.params.id;
-        const { session_name, session_objective, session_start, session_end, session_tasks, session_payed } = req.body;
+        const { sessionName, sessionObjective, sessionStart, sessionEnd, sessionTasks, sessionPayed, fkIdStudentSubject } = req.body;
 
         const query = `
             UPDATE session
@@ -125,17 +133,19 @@ const updateSession = async (req, res, next) => {
                 session_start = ?, 
                 session_end = ?, 
                 session_tasks = ?, 
-                session_payed = ?
+                session_payed = ?,
+                fk_id_student_subject = ?
             WHERE id_session = ?
         `;
         
         const [result] = await db.execute(query, [
-            session_name, 
-            session_objective, 
-            session_start, 
-            session_end, 
-            session_tasks, 
-            session_payed, 
+            sessionName, 
+            sessionObjective, 
+            sessionStart, 
+            sessionEnd, 
+            sessionTasks, 
+            sessionPayed,
+            fkIdStudentSubject, 
             id
         ]);
 
