@@ -20,6 +20,7 @@ const getStudentsByTeacher = async (req, res, next) => {
             INNER JOIN academic_year ON fk_id_academic_year = id_academic_year
             INNER JOIN payment_method ON fk_id_payment_method = id_payment_method
             WHERE fk_id_teacher = ?
+            ORDER BY id_student DESC;
         `;
 
         const [students, _] = await db.execute(query, [teacherId]);
