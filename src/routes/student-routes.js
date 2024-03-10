@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 //importando controladores
-const { getAllStudents, getStudentsByTeacher, getStudentById, addNewStudent, updateStudent, checkRepeatEmail } = require('../controllers/student-controller');
+const { getAllStudents, getStudentsByTeacher, getStudentById, addNewStudent, updateStudent, checkRepeatEmail, deleteStudentById } = require('../controllers/student-controller');
 
 //get
 router.get('/', getAllStudents);
@@ -21,9 +21,9 @@ router.post('/:teacherId', addNewStudent);
 router.put('/:id', updateStudent);
 
 //chek repeat email
-router.post('/check-email/:teacherId', checkRepeatEmail)
-
+router.post('/check-email/:teacherId', checkRepeatEmail);
 
 //delete
-//falta si hace falta hacer toda la cascada de eliminar o no
+router.delete('/:idStudent', deleteStudentById);
+
 module.exports = router;

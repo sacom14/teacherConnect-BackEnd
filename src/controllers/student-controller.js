@@ -135,7 +135,7 @@ const updateStudent = async (req, res, next) => {
         const [result] = await db.execute(query, [studentName, studentSurname, studentEmail, studentBirthdate, studentPhone, studentPhoto, fkIdTeacher, fkIdAcademicYear, fkIdPaymentMethod, id]);
 
         if (result.affectedRows > 0) {
-            res.status(200).json({ message: "Student successfully updated"});
+            res.status(200).json({ message: "Student successfully updated" });
         } else {
             res.status(404).json({ message: "Any student with this ID" });
         }
@@ -168,5 +168,28 @@ const checkRepeatEmail = async (req, res, next) => {
     }
 }
 
+const deleteStudentById = async (req, res, next) => {
+    try {
+        const idStudent = req.params.idStudent;
+        const deleteSessionsQuery = `DELETE FROM session WHERE fk_id_student_subject IN (SELECT id_student_subject FROM student_subject WHERE fk_id_student = ?)`;
+        await db.execute(deleteSessionsQuery, [idStudent]);
 
-module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent, getStudentsByTeacher, checkRepeatEmail };
+        const deleteStudentSubjectQuery = `DELETE FROM student_subject WHERE fk_id_student = ?`;
+        await db.execute(deleteStudentSubjectQuery, [idStudent]);
+
+        const deleteStudentQuery = `DELETE FROM student WHERE id_student = ?`;
+        const [result] = await db.execute(deleteStudentQuery, [idStudent]);
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Student and related entries deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Student not found or already deleted' });
+        }
+    } catch (error) {
+        console.error('Error deleting student:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+module.exports = { getAllStudents, getStudentById, addNewStudent, updateStudent, getStudentsByTeacher, checkRepeatEmail, deleteStudentById };

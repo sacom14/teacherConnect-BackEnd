@@ -36,6 +36,6 @@ app.use('/api/subject', subject);
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-    console.log("Servidor conectado port => ", port)
+    console.log("Server connected port => ", port)
 });
 

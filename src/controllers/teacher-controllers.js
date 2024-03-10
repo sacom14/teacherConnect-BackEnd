@@ -34,9 +34,9 @@ const getTeacherById = async (req, res, next) => {
 
 const updateTeacher = async (req, res, next) => {
     try {
-        const id = req.params.id; //cogemos el parametro de ID
+        const idTeacher = req.params.idTeacher; //cogemos el parametro de ID
         const { teacherName, teacherSurname, teacherEmail, teacherPassword, teacherPhone, teacherBirthdate, teacherPhoto } = req.body;
-        const hashedPassword = await bcrypt.hash(teacher_password, 10);
+        const hashedPassword = await bcrypt.hash(teacherPassword, 10);
 
         const query = `
             UPDATE teacher 
@@ -51,7 +51,7 @@ const updateTeacher = async (req, res, next) => {
         `;
 
         //[result] para ver resultado de consulta de affectdRows
-        const [result] = await db.execute(query, [teacherName, teacherSurname, teacherEmail, teacherPassword, teacherPhone, teacherBirthdate, teacherPhoto, id]);
+        const [result] = await db.execute(query, [teacherName, teacherSurname, teacherEmail, hashedPassword, teacherPhone, teacherBirthdate, teacherPhoto, idTeacher]);
 
         if (result.affectedRows > 0) {
             res.status(200).json({ message: "Teacher successfully updated" });
@@ -111,18 +111,22 @@ const teacherLogin = async (req, res, next) => {
 
 const checkRepeatEmail = async (req, res, next) => {
     try {
+        const idTeacher = req.params.idTeacher;
         const { teacherEmail } = req.body;
-        console.log(teacherEmail);
         // Consulta para verificar si existe un email en la tabla 'teacher'
         const query = 'SELECT * FROM teacher WHERE teacher_email = ?';
         const [rows] = await db.query(query, [teacherEmail]);
-        console.log(rows)
-
+        
         if (rows.length > 0) {
-            // Si hay resultados, significa que el email ya existe
-            res.status(409).json({ message: "Email already exists" });
+            const existingTeacherId = rows[0].id_teacher;
+            
+            if(existingTeacherId === parseInt(idTeacher)){
+                res.status(200).json({ message: "This email belongs to the current teacher" });
+            } else {
+                res.status(400).json({ message: "Email already exists" });
+            }
         } else {
-            res.status(200).json({ message: "Email unique" });
+            res.status(200).json({ message: "Valid email" });
         }
     } catch (error) {
         // Manejo de errores generales
@@ -130,4 +134,56 @@ const checkRepeatEmail = async (req, res, next) => {
     }
 }
 
-module.exports = { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin, checkRepeatEmail };
+const deleteTeacherById = async (req, res, next) => {
+    try {
+        const idTeacher = req.params.idTeacher;
+
+        const deleteSessionsQuery = `
+            DELETE FROM session 
+            WHERE fk_id_student_subject IN (
+                SELECT id_student_subject 
+                FROM student_subject 
+                WHERE fk_id_student IN (
+                    SELECT id_student 
+                    FROM student 
+                    WHERE fk_id_teacher = ?
+                )
+            )
+        `;
+        await db.execute(deleteSessionsQuery, [idTeacher]);
+
+        const deleteStudentSubjectQuery = `
+            DELETE FROM student_subject 
+            WHERE fk_id_student IN (
+                SELECT id_student 
+                FROM student 
+                WHERE fk_id_teacher = ?
+            )
+        `;
+        await db.execute(deleteStudentSubjectQuery, [idTeacher]);
+
+        const deleteStudentsQuery = `
+            DELETE FROM student 
+            WHERE fk_id_teacher = ?
+        `;
+        await db.execute(deleteStudentsQuery, [idTeacher]);
+
+        const deleteTeacherQuery = `
+            DELETE FROM teacher 
+            WHERE id_teacher = ?
+        `;
+        const [result] = await db.execute(deleteTeacherQuery, [idTeacher]);
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Teacher and related students deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Teacher not found or already deleted' });
+        }
+    } catch (error) {
+        console.error('Error deleting teacher:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+module.exports = { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin, checkRepeatEmail, deleteTeacherById };
