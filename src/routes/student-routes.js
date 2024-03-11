@@ -1,29 +1,30 @@
 const express = require('express');
 const router = express.Router();
+const authenticateToken = require('../middlewares/authenticateToken');
+
 
 //importando controladores
 const { getAllStudents, getStudentsByTeacher, getStudentById, addNewStudent, updateStudent, checkRepeatEmail, deleteStudentById } = require('../controllers/student-controller');
 
 //get
-router.get('/', getAllStudents);
+router.get('/',authenticateToken, getAllStudents);
 
 //get by teacher
-router.get('/teacher/:teacherId', getStudentsByTeacher)
+router.get('/teacher/:teacherId',authenticateToken, getStudentsByTeacher)
 
 //get by ID
-router.get('/:id', getStudentById);
-
+router.get('/:id',authenticateToken, getStudentById);
 
 //create new
-router.post('/:teacherId', addNewStudent);
+router.post('/:teacherId',authenticateToken, addNewStudent);
 
 //update
-router.put('/:id', updateStudent);
+router.put('/:id',authenticateToken, updateStudent);
 
 //chek repeat email
-router.post('/check-email/:teacherId', checkRepeatEmail);
+router.post('/check-email/:teacherId',authenticateToken, checkRepeatEmail);
 
 //delete
-router.delete('/:idStudent', deleteStudentById);
+router.delete('/:idStudent',authenticateToken, deleteStudentById);
 
 module.exports = router;
