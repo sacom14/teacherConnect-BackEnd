@@ -96,7 +96,7 @@ const teacherLogin = async (req, res, next) => {
             if (comparePassword) {
                 const secretKey = process.env.JWT_SECRET_KEY;
                 //emitir el TOKEN
-                const token = jwt.sign({ id: teacher[0].id_teacher }, secretKey, { expiresIn: '1h' });
+                const token = jwt.sign({ id: teacher[0].id_teacher }, secretKey, { expiresIn: '2h' });
                 res.status(200).json({ token, teacherId: teacher[0].id_teacher });
             } else {
                 res.status(401).json({ message: "password authentication failed" });
