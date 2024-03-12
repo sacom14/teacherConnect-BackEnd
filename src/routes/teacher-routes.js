@@ -8,7 +8,7 @@ const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLog
 router.get('/', getAllTeachers, authenticateToken);
 
 //get by ID
-router.get('/:id', getTeacherById, authenticateToken);
+router.get('/:id', getTeacherById );
 
 //update
 router.put('/:idTeacher', updateTeacher, authenticateToken);
@@ -17,10 +17,10 @@ router.put('/:idTeacher', updateTeacher, authenticateToken);
 router.post('/', addNewTeacher, authenticateToken);
 
 //login
-router.post('/login', teacherLogin, authenticateToken);
+router.post('/login', teacherLogin);
 
 //chek repeat email
-router.post('/check-email/:idTeacher', checkRepeatEmail, authenticateToken);
+router.post('/check-email/:idTeacher', checkRepeatEmail);
 
 //delete
 router.delete('/:idTeacher', deleteTeacherById, authenticateToken);
