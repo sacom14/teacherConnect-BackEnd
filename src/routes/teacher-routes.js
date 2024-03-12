@@ -14,7 +14,7 @@ router.get('/:id', getTeacherById );
 router.put('/:idTeacher', updateTeacher, authenticateToken);
 
 //create new -- Register
-router.post('/', addNewTeacher, authenticateToken);
+router.post('/', addNewTeacher);
 
 //login
 router.post('/login', teacherLogin);
