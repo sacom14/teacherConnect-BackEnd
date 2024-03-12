@@ -5,7 +5,7 @@ const authenticateToken = require('../middlewares/authenticateToken');
 //importando controladores
 const { getAllTeachers, getTeacherById, addNewTeacher, updateTeacher, teacherLogin, checkRepeatEmail, deleteTeacherById } = require('../controllers/teacher-controllers');
 //get
-router.get('/', getAllTeachers, authenticateToken);
+router.get('/', getAllTeachers);
 
 //get by ID
 router.get('/:id', getTeacherById );
